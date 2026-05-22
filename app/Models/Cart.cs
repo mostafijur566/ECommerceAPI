@@ -13,5 +13,8 @@ namespace app.Models
         // Foreign Key
         public int UserId { get; set; }
         public User User { get; set; } = null!;
+
+        // Navigation
+        public ICollection<CartItem> CartItems { get; set; } = new List<CartItem>();
     }
 }
