@@ -7,7 +7,7 @@ namespace app.Models
 {
     public class Order
     {
-        public int Id { get; set; }
+        public Guid Id { get; set; }
         public decimal TotalAmount { get; set; }
         public string Status { get; set; } = "Pending"; // Pending, Processing, Shipped, Delivered, Cancelled
         public string? ShippingAddress { get; set; }
