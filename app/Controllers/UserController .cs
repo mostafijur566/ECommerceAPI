@@ -9,7 +9,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace app.Controllers
 {
-    [Route("api/auth")]
+    [Route("api/user")]
     [ApiController]
     public class UserController : ControllerBase
     {
