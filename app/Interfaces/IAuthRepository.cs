@@ -6,7 +6,7 @@ using app.Dtos.User;
 
 namespace app.Interfaces
 {
-    public interface IUserRepository
+    public interface IAuthRepository
     {
         Task<UserResponseDto?> GetByIdAsync(Guid id);
         Task<UserResponseDto?> GetByEmailAsync(string email);

@@ -10,68 +10,68 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace app.Controllers
 {
-    [Route("api/user")]
+    [Route("api/auth")]
     [ApiController]
-    public class UserController : ControllerBase
+    public class AuthController : ControllerBase
     {
-        private readonly IUserRepository _userRepo;
+        private readonly IAuthRepository _authRepo;
 
-        public UserController(IUserRepository userRepo)
+        public AuthController(IAuthRepository authRepo)
         {
-            _userRepo = userRepo;
+            _authRepo = authRepo;
         }
 
-        // POST api/user/register-admin
+        // POST api/auth/register-admin
         [HttpPost("register-admin")]
         [Authorize(Roles = "Admin")] // only existing admin can create another
         public async Task<IActionResult> RegisterAdmin([FromBody] RegisterDto dto)
         {
-            if (await _userRepo.EmailExistsAsync(dto.Email))
+            if (await _authRepo.EmailExistsAsync(dto.Email))
                 return BadRequest(ApiResponse<string>.FailResponse("Email already exists."));
 
-            var user = await _userRepo.RegisterAsync(dto, role: "Admin");
+            var user = await _authRepo.RegisterAsync(dto, role: "Admin");
             return Ok(ApiResponse<UserResponseDto>.SuccessResponse(user, "Admin registered successfully."));
         }
 
-        // POST api/user/register
+        // POST api/auth/register
         [HttpPost("register")]
         public async Task<IActionResult> Register([FromBody] RegisterDto dto)
         {
-            if (await _userRepo.EmailExistsAsync(dto.Email))
+            if (await _authRepo.EmailExistsAsync(dto.Email))
                 return BadRequest(new { message = "Email already exists." });
 
-            var user = await _userRepo.RegisterAsync(dto);
+            var user = await _authRepo.RegisterAsync(dto);
             return CreatedAtAction(nameof(GetById), new { id = user.Id }, user);
         }
 
-        // POST api/user/login
+        // POST api/auth/login
         [HttpPost("login")]
         public async Task<IActionResult> Login([FromBody] LoginDto dto)
         {
-            var result = await _userRepo.LoginAsync(dto);
+            var result = await _authRepo.LoginAsync(dto);
             if (result == null)
                 return Unauthorized(new { message = "Invalid email or password." });
 
             return Ok(result);
         }
 
-        // GET api/user/{id}
+        // GET api/auth/{id}
         [HttpGet("{id}")]
         [Authorize]
         public async Task<IActionResult> GetById(Guid id)
         {
-            var user = await _userRepo.GetByIdAsync(id);
+            var user = await _authRepo.GetByIdAsync(id);
             if (user == null) return NotFound(new { message = "User not found." });
 
             return Ok(user);
         }
 
-        // DELETE api/user/{id}
+        // DELETE api/auth/{id}
         [HttpDelete("{id}")]
         [Authorize(Roles = "Admin")]
         public async Task<IActionResult> Delete(Guid id)
         {
-            var result = await _userRepo.DeleteAsync(id);
+            var result = await _authRepo.DeleteAsync(id);
             if (!result) return NotFound(new { message = "User not found." });
 
             return NoContent();

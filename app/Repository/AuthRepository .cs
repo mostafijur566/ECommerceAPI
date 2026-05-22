@@ -15,12 +15,12 @@ using Microsoft.IdentityModel.Tokens;
 
 namespace app.Repository
 {
-    public class UserRepository : IUserRepository
+    public class AuthRepository : IAuthRepository
     {
         private readonly ApplicationDbContext _context;
         private readonly IConfiguration _config;
 
-        public UserRepository(ApplicationDbContext context, IConfiguration config)
+        public AuthRepository(ApplicationDbContext context, IConfiguration config)
         {
             _context = context;
             _config = config;
