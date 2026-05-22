@@ -17,5 +17,7 @@ namespace app.Models
         public int UserId { get; set; }
         public User User { get; set; } = null!;
 
+        // Navigation
+        public ICollection<OrderItem> OrderItems { get; set; } = new List<OrderItem>();
     }
 }
