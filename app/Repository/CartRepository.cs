@@ -4,13 +4,14 @@ using System.Linq;
 using System.Threading.Tasks;
 using app.Data;
 using app.Dtos.Cart;
+using app.Interfaces;
 using app.Mapper;
 using app.Models;
 using Microsoft.EntityFrameworkCore;
 
 namespace app.Repository
 {
-    public class CartRepository
+    public class CartRepository : ICartRepository
     {
         private readonly ApplicationDbContext _context;
 
