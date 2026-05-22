@@ -46,14 +46,14 @@ namespace app.Repository
             return await _context.Users.AnyAsync(u => u.Email == email);
         }
 
-        public async Task<UserResponseDto> RegisterAsync(RegisterDto dto)
+        public async Task<UserResponseDto> RegisterAsync(RegisterDto dto, string? role = "Customer")
         {
             var user = new User
             {
                 FullName = dto.FullName,
                 Email = dto.Email,
                 PasswordHash = BCrypt.Net.BCrypt.HashPassword(dto.Password),
-                Role = "Customer",
+                Role = role ?? "Customer",
                 CreatedAt = DateTime.UtcNow
             };
 

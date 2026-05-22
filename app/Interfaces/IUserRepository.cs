@@ -11,7 +11,7 @@ namespace app.Interfaces
         Task<UserResponseDto?> GetByIdAsync(Guid id);
         Task<UserResponseDto?> GetByEmailAsync(string email);
         Task<bool> EmailExistsAsync(string email);
-        Task<UserResponseDto> RegisterAsync(RegisterDto dto);
+        Task<UserResponseDto> RegisterAsync(RegisterDto dto, string? role = "Customer");
         Task<AuthResponseDto?> LoginAsync(LoginDto dto);
         Task<bool> DeleteAsync(Guid id);
     }
