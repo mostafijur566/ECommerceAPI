@@ -13,5 +13,8 @@ namespace app.Models
         public string PasswordHash { get; set; } = string.Empty;
         public string Role { get; set; } = "Customer"; // Admin, Customer
         public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
+
+        public Cart? Cart { get; set; }
+        public ICollection<Order> Orders { get; set; } = new List<Order>();
     }
 }
