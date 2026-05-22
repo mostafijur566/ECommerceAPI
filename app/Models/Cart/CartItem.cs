@@ -7,7 +7,7 @@ namespace app.Models
 {
     public class CartItem
     {
-        public Guid Id { get; set; }
+        public Guid Id { get; set; } = Guid.NewGuid();
         public int Quantity { get; set; }
 
         // Foreign Keys

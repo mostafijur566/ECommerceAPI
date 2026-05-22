@@ -7,7 +7,7 @@ namespace app.Models
 {
     public class Product
     {
-        public Guid Id { get; set; }
+        public Guid Id { get; set; } = Guid.NewGuid();
         public string Name { get; set; } = string.Empty;
         public string? Description { get; set; }
         public decimal Price { get; set; }
@@ -17,7 +17,7 @@ namespace app.Models
         public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
 
         // Foreign Key
-        public int CategoryId { get; set; }
+        public Guid CategoryId { get; set; }
         public Category Category { get; set; } = null!;
 
         // Navigation

@@ -7,7 +7,7 @@ namespace app.Models
 {
     public class OrderItem
     {
-        public Guid Id { get; set; }
+        public Guid Id { get; set; } = Guid.NewGuid();
         public int Quantity { get; set; }
         public decimal UnitPrice { get; set; } // Price at time of purchase
 

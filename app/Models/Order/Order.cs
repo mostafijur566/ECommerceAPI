@@ -7,14 +7,14 @@ namespace app.Models
 {
     public class Order
     {
-        public Guid Id { get; set; }
+        public Guid Id { get; set; } = Guid.NewGuid();
         public decimal TotalAmount { get; set; }
         public string Status { get; set; } = "Pending"; // Pending, Processing, Shipped, Delivered, Cancelled
         public string? ShippingAddress { get; set; }
         public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
 
         // Foreign Key
-        public int UserId { get; set; }
+        public Guid UserId { get; set; }
         public User User { get; set; } = null!;
 
         // Navigation

@@ -7,6 +7,7 @@ using System.Text;
 using System.Threading.Tasks;
 using app.Data;
 using app.Dtos.User;
+using app.Interfaces;
 using app.Mapper;
 using app.Models;
 using Microsoft.EntityFrameworkCore;
@@ -14,10 +15,16 @@ using Microsoft.IdentityModel.Tokens;
 
 namespace app.Repository
 {
-    public class UserRepository 
+    public class UserRepository : IUserRepository
     {
         private readonly ApplicationDbContext _context;
         private readonly IConfiguration _config;
+
+        public UserRepository(ApplicationDbContext context, IConfiguration config)
+        {
+            _context = context;
+            _config = config;
+        }
 
         public async Task<UserResponseDto?> GetByIdAsync(Guid id)
         {
@@ -39,7 +46,7 @@ namespace app.Repository
             return await _context.Users.AnyAsync(u => u.Email == email);
         }
 
-         public async Task<UserResponseDto> RegisterAsync(RegisterDto dto)
+        public async Task<UserResponseDto> RegisterAsync(RegisterDto dto)
         {
             var user = new User
             {
@@ -72,6 +79,17 @@ namespace app.Repository
                 User = UserMapper.ToUserDto(user)
             };
         }
+
+        public async Task<bool> DeleteAsync(Guid id)
+        {
+            var user = await _context.Users.FindAsync(id);
+            if (user == null) return false;
+
+            _context.Users.Remove(user);
+            await _context.SaveChangesAsync();
+            return true;
+        }
+
 
         // Helper
         private string GenerateJwtToken(User user)
