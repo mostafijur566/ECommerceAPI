@@ -2,6 +2,7 @@ using System.Text;
 using app.Data;
 using app.Interfaces;
 using app.Models;
+using app.Repositories;
 using app.Repository;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
@@ -45,6 +46,7 @@ builder.Services.AddDbContext<ApplicationDbContext>(options =>
 // Add repositories
 builder.Services.AddScoped<IAuthRepository, AuthRepository>();
 builder.Services.AddScoped<ICategoryRepository, CategoryRepository>();
+builder.Services.AddScoped<IProductRepository, ProductRepository>();
 
 // JWT Auths
 var jwtSettings = builder.Configuration.GetSection("JwtSettings");
