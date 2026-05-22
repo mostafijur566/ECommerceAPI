@@ -217,3 +217,4 @@ D:\ASP\ECommerceAPI\app\obj\Debug\net10.0\app.genruntimeconfig.cache
 D:\ASP\ECommerceAPI\app\obj\Debug\net10.0\ref\app.dll
 D:\ASP\ECommerceAPI\app\bin\Debug\net10.0\BCrypt-Net-Next.dll
 D:\ASP\ECommerceAPI\app\bin\Debug\net10.0\Microsoft.AspNetCore.Authentication.JwtBearer.dll
+D:\ASP\ECommerceAPI\app\bin\Debug\net10.0\app.staticwebassets.runtime.json

@@ -54,7 +54,7 @@ namespace app.Controllers
         // POST api/product
         [HttpPost]
         [Authorize(Roles = "Admin")]
-        public async Task<IActionResult> Create([FromBody] CreateProductDto dto)
+        public async Task<IActionResult> Create([FromForm] CreateProductDto dto)
         {
             var product = await _productRepo.CreateAsync(dto);
             return CreatedAtAction(nameof(GetById), new { id = product.Id },
@@ -65,7 +65,7 @@ namespace app.Controllers
         // PUT api/product/{id}
         [HttpPut("{id}")]
         [Authorize(Roles = "Admin")]
-        public async Task<IActionResult> Update(Guid id, [FromBody] UpdateProductDto dto)
+        public async Task<IActionResult> Update(Guid id, [FromForm] UpdateProductDto dto)
         {
             var product = await _productRepo.UpdateAsync(id, dto);
             if (product == null)
