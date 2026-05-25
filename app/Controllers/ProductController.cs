@@ -21,13 +21,13 @@ namespace app.Controllers
             _productRepo = productRepo;
         }
 
-        // GET api/product
+        // GET api/product?page=1&pageSize=10&search=phone&categoryId=...&minPrice=100&maxPrice=500&sortBy=price&sortOrder=asc
         [HttpGet]
-        public async Task<IActionResult> GetAll()
+        public async Task<IActionResult> GetAll([FromQuery] ProductQueryParams queryParams)
         {
-            var products = await _productRepo.GetAllAsync();
-            return Ok(ApiResponse<List<ProductResponseDto>>.SuccessResponse(
-                products, "Products retrieved successfully."));
+            var result = await _productRepo.GetAllAsync(queryParams);
+            return Ok(ApiResponse<PagedResponse<ProductResponseDto>>.SuccessResponse(
+                result, "Products retrieved successfully."));
         }
 
         // GET api/product/{id}

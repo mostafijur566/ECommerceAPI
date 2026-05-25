@@ -1,5 +1,6 @@
 using app.Data;
 using app.Dtos.Product;
+using app.Helper;
 using app.Interfaces;
 using app.Mapper;
 using app.Models;
@@ -16,13 +17,55 @@ namespace app.Repositories
             _context = context;
         }
 
-        public async Task<List<ProductResponseDto>> GetAllAsync()
+        public async Task<PagedResponse<ProductResponseDto>> GetAllAsync(ProductQueryParams q)
         {
-            return await _context.Products
+            var query = _context.Products
                 .Include(p => p.Category)
                 .Where(p => p.IsActive)
+                .AsQueryable();
+
+            // ── Search ────────────────────────────────────────
+            if (!string.IsNullOrWhiteSpace(q.Search))
+                query = query.Where(p =>
+                    p.Name.Contains(q.Search) ||
+                    (p.Description != null && p.Description.Contains(q.Search)));
+
+            // ── Filter by Category ────────────────────────────
+            if (q.CategoryId.HasValue)
+                query = query.Where(p => p.CategoryId == q.CategoryId.Value);
+
+            // ── Filter by Price ───────────────────────────────
+            if (q.MinPrice.HasValue)
+                query = query.Where(p => p.Price >= q.MinPrice.Value);
+
+            if (q.MaxPrice.HasValue)
+                query = query.Where(p => p.Price <= q.MaxPrice.Value);
+
+            // ── Sorting ───────────────────────────────────────
+            query = q.SortBy?.ToLower() switch
+            {
+                "price" => q.SortOrder == "desc"
+                                ? query.OrderByDescending(p => p.Price)
+                                : query.OrderBy(p => p.Price),
+                "name" => q.SortOrder == "desc"
+                                ? query.OrderByDescending(p => p.Name)
+                                : query.OrderBy(p => p.Name),
+                "createdat" => q.SortOrder == "desc"
+                                ? query.OrderByDescending(p => p.CreatedAt)
+                                : query.OrderBy(p => p.CreatedAt),
+                _ => query.OrderByDescending(p => p.CreatedAt) // default
+            };
+
+            // ── Pagination ────────────────────────────────────
+            var totalRecords = await query.CountAsync();
+
+            var products = await query
+                .Skip((q.Page - 1) * q.PageSize)
+                .Take(q.PageSize)
                 .Select(p => p.ToProductResponseDto())
                 .ToListAsync();
+
+            return PagedResponse<ProductResponseDto>.Create(products, q.Page, q.PageSize, totalRecords);
         }
 
         public async Task<ProductResponseDto?> GetByIdAsync(Guid id)
