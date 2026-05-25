@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using app.Data;
 using app.Dtos.Order;
 using app.Interfaces;
+using app.Mapper;
 using app.Models;
 using Microsoft.EntityFrameworkCore;
 
@@ -77,7 +78,7 @@ namespace app.Repository
                     .ThenInclude(oi => oi.Product)
                 .Where(o => o.UserId == userId)
                 .OrderByDescending(o => o.CreatedAt)
-                .Select(o => MapToResponse(o))
+                .Select(o => OrderMapper.ToOrderResponseDto(o))
                 .ToListAsync();
         }
 
@@ -89,7 +90,7 @@ namespace app.Repository
                 .FirstOrDefaultAsync(o => o.Id == orderId && o.UserId == userId);
 
             if (order == null) return null;
-            return MapToResponse(order);
+            return OrderMapper.ToOrderResponseDto(order);
         }
 
         public async Task<List<OrderResponseDto>> GetAllOrdersAsync()
@@ -98,7 +99,7 @@ namespace app.Repository
                 .Include(o => o.OrderItems)
                     .ThenInclude(oi => oi.Product)
                 .OrderByDescending(o => o.CreatedAt)
-                .Select(o => MapToResponse(o))
+                .Select(o => OrderMapper.ToOrderResponseDto(o))
                 .ToListAsync();
         }
 
@@ -113,7 +114,7 @@ namespace app.Repository
 
             order.Status = dto.Status;
             await _context.SaveChangesAsync();
-            return MapToResponse(order);
+            return OrderMapper.ToOrderResponseDto(order);
         }
 
         public async Task<bool> CancelOrderAsync(Guid orderId, Guid userId)
@@ -148,27 +149,10 @@ namespace app.Repository
                     .ThenInclude(oi => oi.Product)
                 .FirstOrDefaultAsync(o => o.Id == orderId);
 
-            return MapToResponse(order!);
+            if (order == null) throw new InvalidOperationException("Order not found.");
+
+            return OrderMapper.ToOrderResponseDto(order!);
         }
 
-        private static OrderResponseDto MapToResponse(Order o) => new()
-        {
-            OrderId = o.Id,
-            Status = o.Status,
-            ShippingAddress = o.ShippingAddress ?? string.Empty,
-            TotalAmount = o.TotalAmount,
-            CreatedAt = o.CreatedAt,
-            Items = o.OrderItems.Select(oi => new OrderItemResponseDto
-            {
-                OrderItemId = oi.Id,
-                ProductId = oi.ProductId,
-                ProductName = oi.Product?.Name ?? string.Empty,
-                ImageUrl = oi.Product?.ImageUrl,
-                UnitPrice = oi.UnitPrice,
-                Quantity = oi.Quantity,
-                SubTotal = oi.UnitPrice * oi.Quantity
-            }).ToList()
-        };
-    
     }
 }
