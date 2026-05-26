@@ -9,7 +9,7 @@ namespace app.Dtos.Order
     public class PlaceOrderDto
     {
         [Required]
-        [Range(1, int.MaxValue, ErrorMessage = "CartId must be greater than 0.")]
+        [StringLength(200, MinimumLength = 10, ErrorMessage = "Shipping address must be between 10 and 200 characters.")]
         public string ShippingAddress { get; set; } = string.Empty;
     }
 }

@@ -8,10 +8,10 @@ namespace app.Dtos.Category
     public class CreateCategoryDto
     {
         [Required]
-        [StringLength(100, MinimumLength = 2), RegularExpression(@"^[a-zA-Z0-9\s]+$", ErrorMessage = "Name can only contain letters, numbers and spaces.")]
+        [StringLength(100, MinimumLength = 2, ErrorMessage = "Name must be between 2 and 100 characters.")]
         public string Name { get; set; } = string.Empty;
 
-        [StringLength(500, ErrorMessage = "Description cannot exceed 500 characters."), RegularExpression(@"^[a-zA-Z0-9\s.,!?'-]*$", ErrorMessage = "Description can only contain letters, numbers, spaces and basic punctuation.")]
+        [StringLength(500, ErrorMessage = "Description cannot exceed 500 characters.")]
         public string? Description { get; set; }
     }
 }

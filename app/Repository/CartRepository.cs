@@ -28,33 +28,53 @@ namespace app.Repository
 
         public async Task<CartResponseDto> AddToCartAsync(Guid userId, AddToCartDto dto)
         {
-            var cart = await GetOrCreateCartAsync(userId);
+            // ✅ Find or create cart
+            var cart = await _context.Carts
+                .Include(c => c.CartItems)
+                    .ThenInclude(ci => ci.Product)
+                .FirstOrDefaultAsync(c => c.UserId == userId);
+
+            if (cart == null)
+            {
+                cart = new Cart
+                {
+                    Id = Guid.NewGuid(),
+                    UserId = userId,
+                    UpdatedAt = DateTime.UtcNow
+                };
+                _context.Carts.Add(cart);
+                await _context.SaveChangesAsync(); // ✅ save cart first before adding items
+
+                // reload the cart after saving
+                cart = await _context.Carts
+                    .Include(c => c.CartItems)
+                        .ThenInclude(ci => ci.Product)
+                    .FirstOrDefaultAsync(c => c.UserId == userId);
+            }
 
             // Check if product already in cart
-            var existingItem = cart.CartItems
+            var existingItem = cart!.CartItems
                 .FirstOrDefault(ci => ci.ProductId == dto.ProductId);
 
             if (existingItem != null)
             {
-                // Just increase quantity
                 existingItem.Quantity += dto.Quantity;
             }
             else
             {
-                // Add new item
-                cart.CartItems.Add(new CartItem
+                var newItem = new CartItem
                 {
                     Id = Guid.NewGuid(),
                     CartId = cart.Id,
                     ProductId = dto.ProductId,
                     Quantity = dto.Quantity
-                });
+                };
+                _context.CartItems.Add(newItem); // ✅ add directly to context, not cart.CartItems
             }
 
             cart.UpdatedAt = DateTime.UtcNow;
             await _context.SaveChangesAsync();
 
-            // Reload cart with updated data
             return await GetCartAsync(userId);
         }
 

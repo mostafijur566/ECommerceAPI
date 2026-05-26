@@ -11,8 +11,7 @@ using Microsoft.OpenApi;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Add services to the container.
-// Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
+// ── Controllers & Swagger ──────────────────────────────
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(options =>
@@ -21,10 +20,8 @@ builder.Services.AddSwaggerGen(options =>
     {
         Title = "E-Commerce API",
         Version = "v1",
-        Description = "A simple e-commerce API built with ASP.NET Core 6, demonstrating user authentication, category management, and product management.",
+        Description = "A simple e-commerce API built with ASP.NET Core, demonstrating user authentication, category management, and product management.",
     });
-
-
     options.AddSecurityDefinition("bearer", new OpenApiSecurityScheme
     {
         Type = SecuritySchemeType.Http,
@@ -32,25 +29,24 @@ builder.Services.AddSwaggerGen(options =>
         BearerFormat = "JWT",
         Description = "JWT Authorization header using the Bearer scheme."
     });
-
     options.AddSecurityRequirement(document => new OpenApiSecurityRequirement
     {
         [new OpenApiSecuritySchemeReference("bearer", document)] = []
     });
 });
 
-// Add DbContext
+// ── DbContext ──────────────────────────────────────────
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 
-// Add repositories
+// ── Repositories ───────────────────────────────────────
 builder.Services.AddScoped<IAuthRepository, AuthRepository>();
 builder.Services.AddScoped<ICategoryRepository, CategoryRepository>();
 builder.Services.AddScoped<IProductRepository, ProductRepository>();
 builder.Services.AddScoped<ICartRepository, CartRepository>();
 builder.Services.AddScoped<IOrderRepository, OrderRepository>();
 
-// JWT Auths
+// ── JWT Auth ───────────────────────────────────────────
 var jwtSettings = builder.Configuration.GetSection("JwtSettings");
 var key = Encoding.UTF8.GetBytes(jwtSettings["SecretKey"]!);
 
@@ -73,13 +69,19 @@ builder.Services.AddAuthentication(options =>
     };
 });
 
-var app = builder.Build();
+// ── CORS ───────────────────────────────────────────────
+builder.Services.AddCors(options =>
+    options.AddDefaultPolicy(policy =>
+        policy.AllowAnyOrigin().AllowAnyMethod().AllowAnyHeader()));
 
-// ✅ Seed Admin
+// ══════════════════════════════════════════════════════
+var app = builder.Build();
+// ══════════════════════════════════════════════════════
+
+// ── Seed Admin ─────────────────────────────────────────
 using (var scope = app.Services.CreateScope())
 {
     var context = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
-
     if (!context.Users.Any(u => u.Email == "admin@gmail.com"))
     {
         context.Users.Add(new User
@@ -95,7 +97,7 @@ using (var scope = app.Services.CreateScope())
     }
 }
 
-// Configure the HTTP request pipeline.
+// ── Middleware Pipeline ────────────────────────────────
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
@@ -103,12 +105,9 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseStaticFiles();
-
+app.UseCors();
 app.UseHttpsRedirection();
-
 app.UseAuthentication();
 app.UseAuthorization();
-
 app.MapControllers();
-
 app.Run();
